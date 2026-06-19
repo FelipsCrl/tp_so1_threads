@@ -31,10 +31,17 @@ typedef struct
     pthread_cond_t condincaoPorPrioridade[QTD_PRIORIDADES];
 } monitor_caixa;
 
+void atendidoPeloCaixa(Pessoa *pessoa, monitor_caixa *mc);
+void vaiEmboraParaCasa(Pessoa *pessoa, monitor_caixa *mc);
+void adicionar_letra_fila(char inicial, monitor_caixa *mc);
+void remover_letra_fila(char inicial, monitor_caixa *mc);
+void verificar(Pessoa *pessoa, monitor_caixa *mc); // gerente verifica se ha deadlock
 void esperar(Pessoa *pessoa, monitor_caixa *mc);
 void liberar(Pessoa *pessoa, monitor_caixa *mc);
-void verificar(Pessoa *pessoa, monitor_caixa *mc); // gerente verifica se ha deadlock
-void atendidoPeloCaixa(Pessoa *pessoa);
-void vaiEmboraParaCasa(Pessoa *pessoa);
+void esperar(Pessoa *pessoa, monitor_caixa *mc);
+int proximaPrioridade(monitor_caixa *mc);
+void *threadFuncao(void *argumento);
+void imprimeFila(monitor_caixa *mc);
+void monitor_init(monitor_caixa *mc);
 
 #endif

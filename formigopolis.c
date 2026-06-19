@@ -50,6 +50,10 @@ void liberar(Pessoa *pessoa, monitor_caixa *mc)
     pthread_mutex_lock(&mc->mutex);
 
     mc->caixaOcupado = 0;
+    
+    // Reseta a prioridade de quem acabou de usar o caixa
+    pessoa->prioridadeAtual = pessoa->prioridadeOriginal;
+    pessoa->vezesFuradas = 0;
 
     int proximaPessoa = proximaPrioridade(mc);
 
@@ -57,7 +61,6 @@ void liberar(Pessoa *pessoa, monitor_caixa *mc)
     {
         /* code */
     }
-    
 
     if (proximaPessoa != 5)
     {
@@ -149,7 +152,7 @@ void *threadFuncao(void *argumento)
         liberar(pessoa, mc);
         vaiEmboraParaCasa(pessoa, mc);
     }
-    return NULL; 
+    return NULL;
 }
 
 int main(int argc, char const *argv[])
