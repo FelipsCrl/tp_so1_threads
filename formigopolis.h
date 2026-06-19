@@ -17,7 +17,15 @@ typedef struct
 
 typedef struct
 {
+    Pessoa *pessoa;
+    monitor_caixa *mc;
+    int numVezesCaixa;
+} ThreadData;
+
+typedef struct
+{
     int filaCaixa[QTD_PRIORIDADES];
+    char filaLetrasNome[(QTD_PRIORIDADES * 2) + 1];
     pthread_mutex_t mutex;
     int caixaOcupado;
     pthread_cond_t condincaoPorPrioridade[QTD_PRIORIDADES];
