@@ -1,23 +1,23 @@
-CC     = gcc
-CFLAGS = -Wall -Wextra -pedantic
- 
+CC = gcc
+CFLAGS = -Wall -Wextra -pedantic -pthread
+
 # Arquivos fonte e objeto
-SRCS = rush.c
+SRCS = formigopolis.c
 OBJS = $(SRCS:.c=.o)
- 
+
 # Alvo padrão
-all: rush
- 
+all: formigopolis
+
 # Linka os objetos no binário final
-rush: $(OBJS)
-	$(CC) $(CFLAGS) -o rush $(OBJS)
- 
+formigopolis: $(OBJS)
+	$(CC) $(CFLAGS) -o formigopolis $(OBJS)
+
 # Compila cada .c em .o
-%.o: %.c rush.h
+%.o: %.c formigopolis.h
 	$(CC) $(CFLAGS) -c $< -o $@
- 
+
 # Remove arquivos gerados
 clean:
-	rm -f $(OBJS) rush
- 
+	rm -f $(OBJS) formigopolis
+
 .PHONY: all clean

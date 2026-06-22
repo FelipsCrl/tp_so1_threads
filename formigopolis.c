@@ -6,43 +6,64 @@
 #include <time.h>
 #include "formigopolis.h"
 
-void monitor_init(monitor_caixa *mc)
+void monitorInit(monitor_caixa *mc)
 {
     pthread_mutex_init(&mc->mutex, NULL);
-
     mc->caixaOcupado = 0;
+    mc->quantidadeDePessoasNaFila=0;
 
     // Inicializa filas e variáveis de condição dinamicamente
     for (int i = 0; i < QTD_PRIORIDADES; i++)
     {
-        mc->filaCaixa[i] = 0;
         pthread_cond_init(&mc->condincaoPorPrioridade[i], NULL);
     }
-
-    mc->filaLetrasNome[0] = '\0'; // Inicializa a fila de letras dos nomes
 }
 
 void esperar(Pessoa *pessoa, monitor_caixa *mc)
 {
     pthread_mutex_lock(&mc->mutex);
 
-    adicionar_letra_fila(pessoa->nome[0], mc);
     printf("%s está na fila do caixa", pessoa->nome);
     imprimeFila(mc);
 
-    mc->filaCaixa[pessoa->prioridadeAtual]++;
+    mc->filaCaixa[mc->quantidadeDePessoasNaFila] = *pessoa;
+    mc->quantidadeDePessoasNaFila++;
 
     while (mc->caixaOcupado == 1 || (proximaPrioridade(mc) < pessoa->prioridadeAtual))
     {
         pthread_cond_wait(&mc->condincaoPorPrioridade[pessoa->prioridadeAtual], &mc->mutex);
     }
 
-    mc->filaCaixa[pessoa->prioridadeAtual]--;
     mc->caixaOcupado = 1;
 
-    remover_letra_fila(pessoa->nome[0], mc);
+    removeDaFila(pessoa, mc);
 
     pthread_mutex_unlock(&mc->mutex);
+}
+
+void removeDaFila(Pessoa *pessoa, monitor_caixa *mc)
+{
+    int indice = -1;
+
+    for (int i = 0; i < mc->quantidadeDePessoasNaFila; i++)
+    {
+
+        if (strcmp(mc->filaCaixa[i].nome, pessoa->nome) == 0)
+        {
+            indice = i;
+            break;
+        }
+    }
+
+    if (indice != -1)
+    {
+        for (int i = indice; i < mc->quantidadeDePessoasNaFila - 1; i++)
+        {
+            mc->filaCaixa[i] = mc->filaCaixa[i + 1];
+        }
+
+        mc->quantidadeDePessoasNaFila--;
+    }
 }
 
 void liberar(Pessoa *pessoa, monitor_caixa *mc)
@@ -50,7 +71,7 @@ void liberar(Pessoa *pessoa, monitor_caixa *mc)
     pthread_mutex_lock(&mc->mutex);
 
     mc->caixaOcupado = 0;
-    
+
     // Reseta a prioridade de quem acabou de usar o caixa
     pessoa->prioridadeAtual = pessoa->prioridadeOriginal;
     pessoa->vezesFuradas = 0;
@@ -82,40 +103,19 @@ void vaiEmboraParaCasa(Pessoa *pessoa, monitor_caixa *mc)
     imprimeFila(mc);
 }
 
-void verificar(Pessoa *pessoa, monitor_caixa *mc)
-{
-    // gerente verifica se ha deadlock
-}
+// void verificar(Pessoa *pessoa, monitor_caixa *mc)
+// {
+//     // gerente verifica se ha deadlock
+// }
 
 void imprimeFila(monitor_caixa *mc)
 {
-    printf("{fila:%s}\n", mc->filaLetrasNome);
-}
-
-// Adiciona a letra no final da string
-void adicionar_letra_fila(char inicial, monitor_caixa *mc)
-{
-    int tamanho = strlen(mc->filaLetrasNome);
-    mc->filaLetrasNome[tamanho] = inicial;
-    mc->filaLetrasNome[tamanho + 1] = '\0';
-}
-
-// Remove a letra quando a pessoa sai da fila para ser atendida
-void remover_letra_fila(char inicial, monitor_caixa *mc)
-{
-    int tamanho = strlen(mc->filaLetrasNome);
-    for (int i = 0; i < tamanho; i++)
+    printf("{fila:");
+    for (int i = 0; i < mc->quantidadeDePessoasNaFila; i++)
     {
-        if (mc->filaLetrasNome[i] == inicial)
-        {
-            // Puxa todas as letras da direita para a esquerda
-            for (int j = i; j < tamanho; j++)
-            {
-                mc->filaLetrasNome[j] = mc->filaLetrasNome[j + 1];
-            }
-            break; // Remove só a primeira que encontrar
-        }
+        printf("%c", mc->filaCaixa[i].nome[0]);
     }
+    printf("}\n");
 }
 
 int proximaPrioridade(monitor_caixa *mc)
@@ -124,7 +124,7 @@ int proximaPrioridade(monitor_caixa *mc)
 
     for (int i = 0; i < QTD_PRIORIDADES; i++)
     {
-        if (mc->filaCaixa[i] > 0)
+        if (mc->filaCaixa[i].prioridadeAtual > 0)
         {
             proxPrio = i;
             return proxPrio;
@@ -166,7 +166,7 @@ int main(int argc, char const *argv[])
     int numVezesCaixa = atoi(argv[1]);
     srand(time(NULL));
     monitor_caixa monitorCaixa;
-    monitor_init(&monitorCaixa);
+    monitorInit(&monitorCaixa);
     Pessoa civil[QTD_PRIORIDADES * 2] =
         {
 
