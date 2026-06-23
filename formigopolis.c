@@ -10,7 +10,7 @@ void monitorInit(monitor_caixa *mc)
 {
     pthread_mutex_init(&mc->mutex, NULL);
     mc->caixaOcupado = 0;
-    mc->quantidadeDePessoasNaFila=0;
+    mc->quantidadeDePessoasNaFila = 0;
 
     // Inicializa filas e variáveis de condição dinamicamente
     for (int i = 0; i < QTD_PRIORIDADES; i++)
@@ -19,22 +19,52 @@ void monitorInit(monitor_caixa *mc)
     }
 }
 
+void envelhecerPessoas(Pessoa pessoaChamada, monitor_caixa *mc)
+{
+    int indice = -1, achei = 0;
+    for (int i = 0; i < mc->quantidadeDePessoasNaFila; i++)
+    {
+        if (strcmp(mc->filaCaixa[i]->nome, pessoaChamada.nome) == 0)
+        {
+            indice = i;
+            achei = 1;
+        }
+        else if (achei)
+        {
+            for (int i = 0; i < indice; i++)
+            {
+                mc->filaCaixa[i]->vezesFuradas++;
+                if (mc->filaCaixa[i]->vezesFuradas >= 2 && mc->filaCaixa[i]->prioridadeAtual > GRAVIDA)
+                {
+                    mc->filaCaixa[i]->prioridadeAtual--; // aumenta a prioridade
+                    mc->filaCaixa[i]->vezesFuradas = 0;  // zera o contador de vezes furadas
+                    detectouInanicao(mc->filaCaixa[i]);
+                }
+            }
+
+            break;
+        }
+    }
+}
+
 void esperar(Pessoa *pessoa, monitor_caixa *mc)
 {
     pthread_mutex_lock(&mc->mutex);
 
+    mc->filaCaixa[mc->quantidadeDePessoasNaFila] = pessoa;
+    mc->quantidadeDePessoasNaFila++;
+
     printf("%s está na fila do caixa", pessoa->nome);
     imprimeFila(mc);
 
-    mc->filaCaixa[mc->quantidadeDePessoasNaFila] = *pessoa;
-    mc->quantidadeDePessoasNaFila++;
-
-    while (mc->caixaOcupado == 1 || (proximaPrioridade(mc) < pessoa->prioridadeAtual))
+    while (mc->caixaOcupado || pessoa->prioridadeAtual != proximaPessoaPrioridade(mc).prioridadeAtual)
     {
         pthread_cond_wait(&mc->condincaoPorPrioridade[pessoa->prioridadeAtual], &mc->mutex);
     }
 
     mc->caixaOcupado = 1;
+
+    envelhecerPessoas(*pessoa, mc);
 
     removeDaFila(pessoa, mc);
 
@@ -48,7 +78,7 @@ void removeDaFila(Pessoa *pessoa, monitor_caixa *mc)
     for (int i = 0; i < mc->quantidadeDePessoasNaFila; i++)
     {
 
-        if (strcmp(mc->filaCaixa[i].nome, pessoa->nome) == 0)
+        if (strcmp(mc->filaCaixa[i]->nome, pessoa->nome) == 0)
         {
             indice = i;
             break;
@@ -76,16 +106,10 @@ void liberar(Pessoa *pessoa, monitor_caixa *mc)
     pessoa->prioridadeAtual = pessoa->prioridadeOriginal;
     pessoa->vezesFuradas = 0;
 
-    int proximaPessoa = proximaPrioridade(mc);
-
-    for (int i = 0; i < QTD_PRIORIDADES; i++)
+    if (mc->quantidadeDePessoasNaFila != 0)
     {
-        /* code */
-    }
-
-    if (proximaPessoa != 5)
-    {
-        pthread_cond_signal(&mc->condincaoPorPrioridade[proximaPessoa]);
+        Pessoa proximaPessoa = proximaPessoaPrioridade(mc);
+        pthread_cond_signal(&mc->condincaoPorPrioridade[proximaPessoa.prioridadeAtual]);
     }
 
     pthread_mutex_unlock(&mc->mutex);
@@ -95,6 +119,11 @@ void atendidoPeloCaixa(Pessoa *pessoa, monitor_caixa *mc)
 {
     printf("%s está sendo atendido(a)", pessoa->nome);
     imprimeFila(mc);
+}
+
+void detectouInanicao(Pessoa *pessoa)
+{
+    printf("Gerente detectou inanição, aumentando prioridade de %s\n", pessoa->nome);
 }
 
 void vaiEmboraParaCasa(Pessoa *pessoa, monitor_caixa *mc)
@@ -110,27 +139,28 @@ void vaiEmboraParaCasa(Pessoa *pessoa, monitor_caixa *mc)
 
 void imprimeFila(monitor_caixa *mc)
 {
-    printf("{fila:");
+    printf(" {fila:");
     for (int i = 0; i < mc->quantidadeDePessoasNaFila; i++)
     {
-        printf("%c", mc->filaCaixa[i].nome[0]);
+        printf("%c", mc->filaCaixa[i]->nome[0]);
     }
     printf("}\n");
 }
 
-int proximaPrioridade(monitor_caixa *mc)
+Pessoa proximaPessoaPrioridade(monitor_caixa *mc)
 {
-    int proxPrio = 5;
+    int valorPrio = 5;
+    int indice = -1;
 
-    for (int i = 0; i < QTD_PRIORIDADES; i++)
+    for (int i = 0; i < mc->quantidadeDePessoasNaFila; i++)
     {
-        if (mc->filaCaixa[i].prioridadeAtual > 0)
+        if (mc->filaCaixa[i]->prioridadeAtual < valorPrio)
         {
-            proxPrio = i;
-            return proxPrio;
+            valorPrio = mc->filaCaixa[i]->prioridadeAtual;
+            indice = i;
         }
     }
-    return proxPrio;
+    return *mc->filaCaixa[indice];
 }
 
 void *threadFuncao(void *argumento)
