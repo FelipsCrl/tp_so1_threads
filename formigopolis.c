@@ -31,14 +31,16 @@ void envelhecerPessoas(Pessoa pessoaChamada, monitor_caixa *mc)
         }
         else if (achei)
         {
-            for (int i = 0; i < indice; i++)
+            for (int j = 0; j < indice; j++)
             {
-                mc->filaCaixa[i]->vezesFuradas++;
-                if (mc->filaCaixa[i]->vezesFuradas >= 2 && mc->filaCaixa[i]->prioridadeAtual > GRAVIDA)
+                mc->filaCaixa[j]->vezesFuradas++;
+                if (mc->filaCaixa[j]->vezesFuradas >= 2 && mc->filaCaixa[j]->prioridadeAtual > GRAVIDA)
                 {
-                    mc->filaCaixa[i]->prioridadeAtual--; // aumenta a prioridade
-                    mc->filaCaixa[i]->vezesFuradas = 0;  // zera o contador de vezes furadas
-                    detectouInanicao(mc->filaCaixa[i]);
+                    int prioridadeOriginal = mc->filaCaixa[j]->prioridadeAtual;
+                    mc->filaCaixa[j]->prioridadeAtual--; // aumenta a prioridade
+                    mc->filaCaixa[j]->vezesFuradas = 0;  // zera o contador de vezes furadas
+                    detectouInanicao(mc->filaCaixa[j]);
+                    pthread_cond_broadcast(&mc->condincaoPorPrioridade[prioridadeOriginal]);
                 }
             }
 
@@ -109,7 +111,7 @@ void liberar(Pessoa *pessoa, monitor_caixa *mc)
     if (mc->quantidadeDePessoasNaFila != 0)
     {
         Pessoa proximaPessoa = proximaPessoaPrioridade(mc);
-        pthread_cond_signal(&mc->condincaoPorPrioridade[proximaPessoa.prioridadeAtual]);
+        pthread_cond_broadcast(&mc->condincaoPorPrioridade[proximaPessoa.prioridadeAtual]);
     }
 
     pthread_mutex_unlock(&mc->mutex);
@@ -124,6 +126,7 @@ void atendidoPeloCaixa(Pessoa *pessoa, monitor_caixa *mc)
 void detectouInanicao(Pessoa *pessoa)
 {
     printf("Gerente detectou inanição, aumentando prioridade de %s\n", pessoa->nome);
+    fflush(stdout);
 }
 
 void vaiEmboraParaCasa(Pessoa *pessoa, monitor_caixa *mc)
@@ -145,6 +148,7 @@ void imprimeFila(monitor_caixa *mc)
         printf("%c", mc->filaCaixa[i]->nome[0]);
     }
     printf("}\n");
+    fflush(stdout);
 }
 
 Pessoa proximaPessoaPrioridade(monitor_caixa *mc)
