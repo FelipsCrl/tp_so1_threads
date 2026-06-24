@@ -9,18 +9,20 @@
 
 typedef struct
 {
+    int id;
     char nome[20];
     int prioridadeAtual;
     int prioridadeOriginal;
     int vezesFuradas;
 } Pessoa;
+
 typedef struct
 {
     Pessoa *filaCaixa[QTD_PRIORIDADES * 2];
     int quantidadeDePessoasNaFila;
     pthread_mutex_t mutex;
     int caixaOcupado;
-    pthread_cond_t condincaoPorPrioridade[QTD_PRIORIDADES];
+    pthread_cond_t condincaoPorPessoa[QTD_PRIORIDADES * 2];
 } monitor_caixa;
 
 typedef struct
@@ -38,8 +40,8 @@ void removeDaFila(Pessoa *pessoa, monitor_caixa *mc);
 void esperar(Pessoa *pessoa, monitor_caixa *mc);
 void liberar(Pessoa *pessoa, monitor_caixa *mc);
 void esperar(Pessoa *pessoa, monitor_caixa *mc);
-Pessoa proximaPessoaPrioridade(monitor_caixa *mc);
-void envelhecerPessoas(Pessoa pessoaChamada, monitor_caixa *mc);
+Pessoa *proximaPessoaPrioridade(monitor_caixa *mc);
+void envelhecerPessoas(Pessoa *pessoaChamada, monitor_caixa *mc);
 void *threadFuncao(void *argumento);
 void imprimeFila(monitor_caixa *mc);
 void monitorInit(monitor_caixa *mc);

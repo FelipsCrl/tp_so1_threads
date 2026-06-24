@@ -13,38 +13,33 @@ void monitorInit(monitor_caixa *mc)
     mc->quantidadeDePessoasNaFila = 0;
 
     // Inicializa filas e variáveis de condição dinamicamente
-    for (int i = 0; i < QTD_PRIORIDADES; i++)
+    for (int i = 0; i < QTD_PRIORIDADES * 2; i++)
     {
-        pthread_cond_init(&mc->condincaoPorPrioridade[i], NULL);
+        pthread_cond_init(&mc->condincaoPorPessoa[i], NULL);
     }
 }
 
-void envelhecerPessoas(Pessoa pessoaChamada, monitor_caixa *mc)
+void envelhecerPessoas(Pessoa *pessoaChamada, monitor_caixa *mc)
 {
-    int indice = -1, achei = 0;
+    int indice = -1;
+
     for (int i = 0; i < mc->quantidadeDePessoasNaFila; i++)
     {
-        if (strcmp(mc->filaCaixa[i]->nome, pessoaChamada.nome) == 0)
+        if (mc->filaCaixa[i] == pessoaChamada)
         {
             indice = i;
-            achei = 1;
-        }
-        else if (achei)
-        {
-            for (int j = 0; j < indice; j++)
-            {
-                mc->filaCaixa[j]->vezesFuradas++;
-                if (mc->filaCaixa[j]->vezesFuradas >= 2 && mc->filaCaixa[j]->prioridadeAtual > GRAVIDA)
-                {
-                    int prioridadeOriginal = mc->filaCaixa[j]->prioridadeAtual;
-                    mc->filaCaixa[j]->prioridadeAtual--; // aumenta a prioridade
-                    mc->filaCaixa[j]->vezesFuradas = 0;  // zera o contador de vezes furadas
-                    detectouInanicao(mc->filaCaixa[j]);
-                    pthread_cond_broadcast(&mc->condincaoPorPrioridade[prioridadeOriginal]);
-                }
-            }
-
             break;
+        }
+    }
+
+    for (int j = 0; j < indice; j++)
+    {
+        mc->filaCaixa[j]->vezesFuradas++;
+        if (mc->filaCaixa[j]->vezesFuradas >= 2 && mc->filaCaixa[j]->prioridadeAtual > GRAVIDA)
+        {
+            mc->filaCaixa[j]->prioridadeAtual--; // aumenta a prioridade
+            mc->filaCaixa[j]->vezesFuradas = 0;  // zera o contador de vezes furadas
+            detectouInanicao(mc->filaCaixa[j]);
         }
     }
 }
@@ -58,17 +53,21 @@ void esperar(Pessoa *pessoa, monitor_caixa *mc)
 
     printf("%s está na fila do caixa", pessoa->nome);
     imprimeFila(mc);
+    fflush(stdout);
 
-    while (mc->caixaOcupado || pessoa->prioridadeAtual != proximaPessoaPrioridade(mc).prioridadeAtual)
+    while (mc->caixaOcupado || pessoa != proximaPessoaPrioridade(mc))
     {
-        pthread_cond_wait(&mc->condincaoPorPrioridade[pessoa->prioridadeAtual], &mc->mutex);
+        pthread_cond_wait(&mc->condincaoPorPessoa[pessoa->id], &mc->mutex);
     }
 
     mc->caixaOcupado = 1;
 
-    envelhecerPessoas(*pessoa, mc);
+    envelhecerPessoas(pessoa, mc);
 
     removeDaFila(pessoa, mc);
+
+    pessoa->vezesFuradas = 0;
+    pessoa->prioridadeAtual = pessoa->prioridadeOriginal;
 
     pthread_mutex_unlock(&mc->mutex);
 }
@@ -110,8 +109,9 @@ void liberar(Pessoa *pessoa, monitor_caixa *mc)
 
     if (mc->quantidadeDePessoasNaFila != 0)
     {
-        Pessoa proximaPessoa = proximaPessoaPrioridade(mc);
-        pthread_cond_broadcast(&mc->condincaoPorPrioridade[proximaPessoa.prioridadeAtual]);
+        Pessoa *proximaPessoa = proximaPessoaPrioridade(mc);
+        printf("Proxima pessoa: %s com %d de prioridade\n", proximaPessoa->nome, proximaPessoa->prioridadeAtual);
+        pthread_cond_signal(&mc->condincaoPorPessoa[proximaPessoa->id]);
     }
 
     pthread_mutex_unlock(&mc->mutex);
@@ -121,11 +121,13 @@ void atendidoPeloCaixa(Pessoa *pessoa, monitor_caixa *mc)
 {
     printf("%s está sendo atendido(a)", pessoa->nome);
     imprimeFila(mc);
+    fflush(stdout);
 }
 
 void detectouInanicao(Pessoa *pessoa)
 {
     printf("Gerente detectou inanição, aumentando prioridade de %s\n", pessoa->nome);
+    printf("Prioridade de %s é %d\n", pessoa->nome, pessoa->prioridadeAtual);
     fflush(stdout);
 }
 
@@ -133,6 +135,7 @@ void vaiEmboraParaCasa(Pessoa *pessoa, monitor_caixa *mc)
 {
     printf("%s vai para casa", pessoa->nome);
     imprimeFila(mc);
+    fflush(stdout);
 }
 
 // void verificar(Pessoa *pessoa, monitor_caixa *mc)
@@ -151,7 +154,7 @@ void imprimeFila(monitor_caixa *mc)
     fflush(stdout);
 }
 
-Pessoa proximaPessoaPrioridade(monitor_caixa *mc)
+Pessoa *proximaPessoaPrioridade(monitor_caixa *mc)
 {
     int valorPrio = 5;
     int indice = -1;
@@ -164,7 +167,7 @@ Pessoa proximaPessoaPrioridade(monitor_caixa *mc)
             indice = i;
         }
     }
-    return *mc->filaCaixa[indice];
+    return mc->filaCaixa[indice];
 }
 
 void *threadFuncao(void *argumento)
@@ -204,14 +207,14 @@ int main(int argc, char const *argv[])
     Pessoa civil[QTD_PRIORIDADES * 2] =
         {
 
-            {"Maria", GRAVIDA, GRAVIDA, 0},
-            {"Marcos", GRAVIDA, GRAVIDA, 0},
-            {"Vanda", IDOSO, IDOSO, 0},
-            {"Valter", IDOSO, IDOSO, 0},
-            {"Paula", DEFICIENTE, DEFICIENTE, 0},
-            {"Pedro", DEFICIENTE, DEFICIENTE, 0},
-            {"Sueli", COMUM, COMUM, 0},
-            {"Silas", COMUM, COMUM, 0}
+            {0, "Maria", GRAVIDA, GRAVIDA, 0},
+            {0, "Marcos", GRAVIDA, GRAVIDA, 0},
+            {0, "Vanda", IDOSO, IDOSO, 0},
+            {0, "Valter", IDOSO, IDOSO, 0},
+            {0, "Paula", DEFICIENTE, DEFICIENTE, 0},
+            {0, "Pedro", DEFICIENTE, DEFICIENTE, 0},
+            {0, "Sueli", COMUM, COMUM, 0},
+            {0, "Silas", COMUM, COMUM, 0}
 
         };
 
@@ -221,6 +224,7 @@ int main(int argc, char const *argv[])
     for (int i = 0; i < QTD_PRIORIDADES * 2; i++)
     {
         argumentos[i].pessoa = &civil[i];
+        argumentos[i].pessoa->id = i; // Id de criação para separar as threads
         argumentos[i].mc = &monitorCaixa;
         argumentos[i].numVezesCaixa = numVezesCaixa;
         pthread_create(&threadsPessoas[i], NULL, threadFuncao, &argumentos[i]);
@@ -233,9 +237,9 @@ int main(int argc, char const *argv[])
 
     // Destroi o mutex e as variáveis de condição
     pthread_mutex_destroy(&monitorCaixa.mutex);
-    for (int i = 0; i < QTD_PRIORIDADES; i++)
+    for (int i = 0; i < QTD_PRIORIDADES * 2; i++)
     {
-        pthread_cond_destroy(&monitorCaixa.condincaoPorPrioridade[i]);
+        pthread_cond_destroy(&monitorCaixa.condincaoPorPessoa[i]);
     }
 
     return 0;
