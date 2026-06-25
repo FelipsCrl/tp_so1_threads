@@ -6,6 +6,7 @@
 #define DEFICIENTE 2
 #define COMUM 3
 #define QTD_PRIORIDADES 4
+#define TEMPO 5
 
 typedef struct
 {
@@ -23,6 +24,7 @@ typedef struct
     pthread_mutex_t mutex;
     int caixaOcupado;
     pthread_cond_t condincaoPorPessoa[QTD_PRIORIDADES * 2];
+    Pessoa *escolhidaGerente;
 } monitor_caixa;
 
 typedef struct
@@ -34,16 +36,16 @@ typedef struct
 
 void atendidoPeloCaixa(Pessoa *pessoa, monitor_caixa *mc);
 void vaiEmboraParaCasa(Pessoa *pessoa, monitor_caixa *mc);
-void detectouInanicao(Pessoa *pessoa);
 void removeDaFila(Pessoa *pessoa, monitor_caixa *mc);
-// void verificar(Pessoa *pessoa, monitor_caixa *mc); // gerente verifica se ha deadlock
+Pessoa *proximaPessoaPrioridade(monitor_caixa *mc);
 void esperar(Pessoa *pessoa, monitor_caixa *mc);
 void liberar(Pessoa *pessoa, monitor_caixa *mc);
 void esperar(Pessoa *pessoa, monitor_caixa *mc);
-Pessoa *proximaPessoaPrioridade(monitor_caixa *mc);
 void envelhecerPessoas(Pessoa *pessoaChamada, monitor_caixa *mc);
 void *threadFuncao(void *argumento);
 void imprimeFila(monitor_caixa *mc);
 void monitorInit(monitor_caixa *mc);
+void *threadGerente(void *argumento);
+void detectouInanicao(Pessoa *pessoa);
 
 #endif
