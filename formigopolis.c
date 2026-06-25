@@ -11,6 +11,7 @@ void monitorInit(monitor_caixa *mc)
     pthread_mutex_init(&mc->mutex, NULL);
     mc->caixaOcupado = 0;
     mc->quantidadeDePessoasNaFila = 0;
+    mc->escolhidaGerente = NULL;
 
     // Inicializa filas e variáveis de condição dinamicamente
     for (int i = 0; i < QTD_PRIORIDADES * 2; i++)
@@ -51,9 +52,7 @@ void esperar(Pessoa *pessoa, monitor_caixa *mc)
     mc->filaCaixa[mc->quantidadeDePessoasNaFila] = pessoa;
     mc->quantidadeDePessoasNaFila++;
 
-    printf("%s está na fila do caixa", pessoa->nome);
-    imprimeFila(mc);
-    fflush(stdout);
+    estaNaFilaCaixa(pessoa, mc);
 
     while (mc->caixaOcupado || (pessoa != proximaPessoaPrioridade(mc) && pessoa != mc->escolhidaGerente))
     {
@@ -65,6 +64,9 @@ void esperar(Pessoa *pessoa, monitor_caixa *mc)
     envelhecerPessoas(pessoa, mc);
 
     removeDaFila(pessoa, mc);
+
+    if (mc->escolhidaGerente == pessoa)
+        mc->escolhidaGerente = NULL; // Reseta a pessoa escolhida pelo gerente
 
     pessoa->vezesFuradas = 0;
     pessoa->prioridadeAtual = pessoa->prioridadeOriginal;
@@ -110,7 +112,9 @@ void liberar(Pessoa *pessoa, monitor_caixa *mc)
     if (mc->quantidadeDePessoasNaFila != 0)
     {
         Pessoa *proximaPessoa = proximaPessoaPrioridade(mc);
-        pthread_cond_signal(&mc->condincaoPorPessoa[proximaPessoa->id]);
+
+        if (proximaPessoa != NULL)
+            pthread_cond_signal(&mc->condincaoPorPessoa[proximaPessoa->id]);
     }
 
     pthread_mutex_unlock(&mc->mutex);
@@ -120,6 +124,19 @@ void atendidoPeloCaixa(Pessoa *pessoa, monitor_caixa *mc)
 {
     printf("%s está sendo atendido(a)", pessoa->nome);
     imprimeFila(mc);
+    fflush(stdout);
+}
+
+void estaNaFilaCaixa(Pessoa *pessoa, monitor_caixa *mc)
+{
+    printf("%s está na fila do caixa", pessoa->nome);
+    imprimeFila(mc);
+    fflush(stdout);
+}
+
+void detectouDeadlock(Pessoa *pessoa)
+{
+    printf("Gerente detectou deadlock, liberando %s para atendimento\n", pessoa->nome);
     fflush(stdout);
 }
 
@@ -159,9 +176,10 @@ void verificar(monitor_caixa *mc)
     if (temGravida && temIdoso && temDeficiente)
     {
         int numeroEscolhido = rand() % mc->quantidadeDePessoasNaFila;
+
         Pessoa *escolhida = mc->filaCaixa[numeroEscolhido];
         mc->escolhidaGerente = escolhida;
-        printf("Gerente detectou deadlock, liberando %s para atendimento\n", escolhida->nome);
+
         pthread_cond_signal(&mc->condincaoPorPessoa[escolhida->id]);
     }
     pthread_mutex_unlock(&mc->mutex);
@@ -182,13 +200,18 @@ Pessoa *proximaPessoaPrioridade(monitor_caixa *mc)
 {
     int temGravida = 0, temIdoso = 0, temDeficiente = 0;
 
-    for (int i = 0; i < mc->quantidadeDePessoasNaFila; i++) {
-        if (mc->filaCaixa[i]->prioridadeAtual == GRAVIDA) temGravida = 1;
-        if (mc->filaCaixa[i]->prioridadeAtual == IDOSO) temIdoso = 1;
-        if (mc->filaCaixa[i]->prioridadeAtual == DEFICIENTE) temDeficiente = 1;
+    for (int i = 0; i < mc->quantidadeDePessoasNaFila; i++)
+    {
+        if (mc->filaCaixa[i]->prioridadeAtual == GRAVIDA)
+            temGravida = 1;
+        if (mc->filaCaixa[i]->prioridadeAtual == IDOSO)
+            temIdoso = 1;
+        if (mc->filaCaixa[i]->prioridadeAtual == DEFICIENTE)
+            temDeficiente = 1;
     }
-    if (temGravida && temIdoso && temDeficiente) {
-        return NULL; 
+    if (temGravida && temIdoso && temDeficiente)
+    {
+        return NULL;
     }
 
     Pessoa *escolhida = mc->filaCaixa[0];
@@ -196,7 +219,6 @@ Pessoa *proximaPessoaPrioridade(monitor_caixa *mc)
     for (int i = 1; i < mc->quantidadeDePessoasNaFila; i++)
     {
         Pessoa *candidato = mc->filaCaixa[i];
-        
 
         if (escolhida->prioridadeAtual == GRAVIDA && candidato->prioridadeAtual == DEFICIENTE)
         {

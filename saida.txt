@@ -1,0 +1,56 @@
+Valter está na fila do caixa {fila:V}
+Valter está sendo atendido(a) {fila:}
+Sueli está na fila do caixa {fila:S}
+Pedro está na fila do caixa {fila:SP}
+Marcos está na fila do caixa {fila:SPM}
+Vanda está na fila do caixa {fila:SPMV}
+Paula está na fila do caixa {fila:SPMVP}
+Valter vai para casa {fila:SPMVP}
+Maria está na fila do caixa {fila:SPMVPM}
+Maria está sendo atendido(a) {fila:SPMVP}
+Silas está na fila do caixa {fila:SPMVPS}
+Maria vai para casa {fila:SPMVPS}
+Valter está na fila do caixa {fila:SPMVPSV}
+Maria está na fila do caixa {fila:SPMVPSVM}
+Gerente detectou inanição, aumentando prioridade de Sueli
+Gerente detectou inanição, aumentando prioridade de Pedro
+Gerente detectou inanição, aumentando prioridade de Vanda
+Gerente detectou inanição, aumentando prioridade de Paula
+Maria está sendo atendido(a) {fila:SPMVPSV}
+Maria vai para casa {fila:SPMVPSV}
+Paula está sendo atendido(a) {fila:SPMVSV}
+Paula vai para casa {fila:SPMVSV}
+Gerente detectou inanição, aumentando prioridade de Sueli
+Gerente detectou inanição, aumentando prioridade de Pedro
+Marcos está sendo atendido(a) {fila:SPVSV}
+Paula está na fila do caixa {fila:SPVSVP}
+Marcos vai para casa {fila:SPVSVP}
+Pedro está sendo atendido(a) {fila:SVSVP}
+Marcos está na fila do caixa {fila:SVSVPM}
+Pedro vai para casa {fila:SVSVPM}
+Sueli está sendo atendido(a) {fila:VSVPM}
+Pedro está na fila do caixa {fila:VSVPMP}
+Sueli vai para casa {fila:VSVPMP}
+Gerente detectou inanição, aumentando prioridade de Silas
+Gerente detectou inanição, aumentando prioridade de Valter
+Marcos está sendo atendido(a) {fila:VSVPP}
+Sueli está na fila do caixa {fila:VSVPPS}
+Marcos vai para casa {fila:VSVPPS}
+Silas está sendo atendido(a) {fila:VVPPS}
+Silas vai para casa {fila:VVPPS}
+Paula está sendo atendido(a) {fila:VVPS}
+Paula vai para casa {fila:VVPS}
+Pedro está sendo atendido(a) {fila:VVS}
+Pedro vai para casa {fila:VVS}
+Vanda está sendo atendido(a) {fila:VS}
+Vanda vai para casa {fila:VS}
+Valter está sendo atendido(a) {fila:S}
+Silas está na fila do caixa {fila:SS}
+Valter vai para casa {fila:SS}
+Sueli está sendo atendido(a) {fila:S}
+Sueli vai para casa {fila:S}
+Silas está sendo atendido(a) {fila:}
+Vanda está na fila do caixa {fila:V}
+Silas vai para casa {fila:V}
+Vanda está sendo atendido(a) {fila:}
+Vanda vai para casa {fila:}

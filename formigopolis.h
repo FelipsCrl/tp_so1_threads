@@ -34,6 +34,7 @@ typedef struct
     int numVezesCaixa;
 } ThreadData;
 
+void estaNaFilaCaixa(Pessoa *pessoa, monitor_caixa *mc);
 void atendidoPeloCaixa(Pessoa *pessoa, monitor_caixa *mc);
 void vaiEmboraParaCasa(Pessoa *pessoa, monitor_caixa *mc);
 void removeDaFila(Pessoa *pessoa, monitor_caixa *mc);
@@ -47,5 +48,6 @@ void imprimeFila(monitor_caixa *mc);
 void monitorInit(monitor_caixa *mc);
 void *threadGerente(void *argumento);
 void detectouInanicao(Pessoa *pessoa);
+void detectouDeadlock(Pessoa *pessoa);
 
 #endif
