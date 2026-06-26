@@ -21,7 +21,7 @@ void monitorInit(MonitorCaixa *mc)
     }
 }
 
-// Função para 'envelhecer'as pessoas que foram puladas na fila
+// Função para 'envelhecer' as pessoas que foram puladas na fila
 void envelhecerPessoas(Pessoa *pessoaChamada, MonitorCaixa *mc)
 {
     int indice = -1;
@@ -73,12 +73,10 @@ void esperar(Pessoa *pessoa, MonitorCaixa *mc)
     envelhecerPessoas(pessoa, mc); // Verifica se furou a fila
     removeDaFila(pessoa, mc);      // Remove a pessoa da fila de espera
 
+    atendidoPeloCaixa(pessoa, mc); // Exibe mensagem que entrou para o caixa
+
     if (mc->escolhidaGerente == pessoa)
         mc->escolhidaGerente = NULL; // Reseta a pessoa escolhida pelo gerente
-
-    // Se a pessoa foi atendida, reseta as vezes furadas e sua prioridade
-    pessoa->vezesFuradas = 0;
-    pessoa->prioridadeAtual = pessoa->prioridadeOriginal;
 
     pthread_mutex_unlock(&mc->mutex); // Destranca o monitor
 }
@@ -141,6 +139,8 @@ void liberar(Pessoa *pessoa, MonitorCaixa *mc)
             }
         }
     }
+
+    vaiEmboraParaCasa(pessoa, mc); // Exibe mensagem que vai para casa
 
     pthread_mutex_unlock(&mc->mutex); // Destranca o monitor
 }
@@ -316,13 +316,9 @@ void *threadFuncao(void *argumento)
 
         esperar(pessoa, mc); // Pessoa entra pra fila e espera até ser chamada
 
-        atendidoPeloCaixa(pessoa, mc); // Exibe mensagem que entrou para o caixa
-
         sleep(1);
 
         liberar(pessoa, mc); // Pessoa sai do caixa e libera a próxima
-
-        vaiEmboraParaCasa(pessoa, mc); // Exibe mensagem que vai para casa
     }
 
     return NULL;
