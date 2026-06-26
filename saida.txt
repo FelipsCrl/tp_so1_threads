@@ -2,49 +2,62 @@ Maria está na fila do caixa {fila:M}
 Maria está sendo atendido(a) {fila:}
 Valter está na fila do caixa {fila:V}
 Pedro está na fila do caixa {fila:VP}
-Sueli está na fila do caixa {fila:VPS}
-Paula está na fila do caixa {fila:VPSP}
-Vanda está na fila do caixa {fila:VPSPV}
-Maria vai para casa {fila:VPSPV}
-Valter está sendo atendido(a) {fila:PSPV}
-Marcos está na fila do caixa {fila:PSPVM}
-Silas está na fila do caixa {fila:PSPVMS}
-Valter vai para casa {fila:PSPVMS}
-Maria está na fila do caixa {fila:PSPVMSM}
-Gerente detectou deadlock, liberando Maria para atendimento
-Maria está sendo atendido(a) {fila:PSPVMS}
-Valter está na fila do caixa {fila:PSPVMSV}
-Maria vai para casa {fila:PSPVMSV}
+Silas está na fila do caixa {fila:VPS}
+Maria vai para casa {fila:VPS}
+Valter está sendo atendido(a) {fila:PSP}
+Paula está na fila do caixa {fila:PSP}
+Sueli está na fila do caixa {fila:PSPS}
+Marcos está na fila do caixa {fila:PSPSM}
+Vanda está na fila do caixa {fila:PSPSMV}
+Valter vai para casa {fila:PSPSMV}
+Gerente detectou deadlock, liberando Paula para atendimento
+Paula está sendo atendido(a) {fila:PSSMV}
+Paula vai para casa {fila:PSSMV}
+Maria está na fila do caixa {fila:PSSMVM}
+Valter está na fila do caixa {fila:PSSMVMV}
+Gerente detectou deadlock, liberando Vanda para atendimento
+Gerente detectou inanição, aumentando prioridade de Pedro
+Gerente detectou inanição, aumentando prioridade de Silas
+Vanda está sendo atendido(a) {fila:PSSMMV}
+Vanda vai para casa {fila:PSSMMV}
+Paula está na fila do caixa {fila:PSSMMVP}
+Vanda está na fila do caixa {fila:PSSMMVPV}
 Gerente detectou deadlock, liberando Marcos para atendimento
-Marcos está sendo atendido(a) {fila:PSPVSV}
-Marcos vai para casa {fila:PSPVSV}
-Vanda está sendo atendido(a) {fila:PSPSV}
-Vanda vai para casa {fila:PSPSV}
-Valter está sendo atendido(a) {fila:PSPS}
-Valter vai para casa {fila:PSPS}
-Pedro está sendo atendido(a) {fila:SPS}
-Pedro vai para casa {fila:SPS}
-Paula está sendo atendido(a) {fila:SS}
-Paula vai para casa {fila:SS}
-Sueli está sendo atendido(a) {fila:S}
-Marcos está na fila do caixa {fila:SM}
-Vanda está na fila do caixa {fila:SMV}
-Sueli vai para casa {fila:SMV}
-Marcos está sendo atendido(a) {fila:SV}
-Pedro está na fila do caixa {fila:SVP}
-Marcos vai para casa {fila:SVP}
-Vanda está sendo atendido(a) {fila:SP}
-Paula está na fila do caixa {fila:SPP}
-Vanda vai para casa {fila:SPP}
-Pedro está sendo atendido(a) {fila:SP}
-Pedro vai para casa {fila:SP}
-Paula está sendo atendido(a) {fila:S}
-Paula vai para casa {fila:S}
+Gerente detectou inanição, aumentando prioridade de Sueli
+Marcos está sendo atendido(a) {fila:PSSMVPV}
+Marcos vai para casa {fila:PSSMVPV}
+Marcos está na fila do caixa {fila:PSSMVPVM}
+Gerente detectou deadlock, liberando Paula para atendimento
+Gerente detectou inanição, aumentando prioridade de Pedro
+Gerente detectou inanição, aumentando prioridade de Silas
+Paula está sendo atendido(a) {fila:PSSMVVM}
+Paula vai para casa {fila:PSSMVVM}
+Gerente detectou deadlock, liberando Pedro para atendimento
+Pedro está sendo atendido(a) {fila:SSMVVM}
+Pedro vai para casa {fila:SSMVVM}
+Gerente detectou deadlock, liberando Silas para atendimento
+Silas está sendo atendido(a) {fila:SMVVM}
+Pedro está na fila do caixa {fila:SMVVMP}
+Silas vai para casa {fila:SMVVMP}
+Gerente detectou deadlock, liberando Valter para atendimento
+Gerente detectou inanição, aumentando prioridade de Sueli
+Valter está sendo atendido(a) {fila:SMVMP}
+Silas está na fila do caixa {fila:SMVMPS}
+Valter vai para casa {fila:SMVMPS}
+Gerente detectou deadlock, liberando Vanda para atendimento
+Vanda está sendo atendido(a) {fila:SMMPS}
+Vanda vai para casa {fila:SMMPS}
+Gerente detectou deadlock, liberando Sueli para atendimento
+Sueli está sendo atendido(a) {fila:MMPS}
+Sueli vai para casa {fila:MMPS}
+Pedro está sendo atendido(a) {fila:MMS}
+Pedro vai para casa {fila:MMS}
+Maria está sendo atendido(a) {fila:MS}
+Maria vai para casa {fila:MS}
+Marcos está sendo atendido(a) {fila:S}
+Marcos vai para casa {fila:S}
 Silas está sendo atendido(a) {fila:}
 Sueli está na fila do caixa {fila:S}
 Silas vai para casa {fila:S}
 Sueli está sendo atendido(a) {fila:}
 Sueli vai para casa {fila:}
-Silas está na fila do caixa {fila:S}
-Silas está sendo atendido(a) {fila:}
-Silas vai para casa {fila:}

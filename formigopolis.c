@@ -61,8 +61,8 @@ void esperar(Pessoa *pessoa, monitor_caixa *mc)
 
     mc->caixaOcupado = 1;
 
-    removeDaFila(pessoa, mc);
     envelhecerPessoas(pessoa, mc);
+    removeDaFila(pessoa, mc);
 
 
     if (mc->escolhidaGerente == pessoa)
