@@ -1,56 +1,50 @@
+A [01;30m[KESPERA[m[K
+A [01;33m[KUSANDO[m[K
 b [01;30m[KESPERA[m[K
-b [01;33m[KUSANDO[m[K
-D [01;30m[KESPERA[m[K
 c [01;30m[KESPERA[m[K
-a [01;30m[KESPERA[m[K
-B [01;30m[KESPERA[m[K
+D [01;30m[KESPERA[m[K
 C [01;30m[KESPERA[m[K
+B [01;30m[KESPERA[m[K
+A [01;32m[KLIBERA[m[K
+b [01;33m[KUSANDO[m[K
+a [01;30m[KESPERA[m[K
+d [01;30m[KESPERA[m[K
 b [01;32m[KLIBERA[m[K
 A [01;30m[KESPERA[m[K
+[01;36m[KDEADLOCK[m[K [01;36m[KRECOVERY[m[K
 A [01;33m[KUSANDO[m[K
-d [01;30m[KESPERA[m[K
-A [01;32m[KLIBERA[m[K
 b [01;30m[KESPERA[m[K
-A [01;30m[KESPERA[m[K
-[01;35m[KDETECTOU[m[K [01;35m[KINANICAO[m[K D
-[01;35m[KDETECTOU[m[K [01;35m[KINANICAO[m[K c
-[01;35m[KDETECTOU[m[K [01;35m[KINANICAO[m[K B
-[01;35m[KDETECTOU[m[K [01;35m[KINANICAO[m[K C
-A [01;33m[KUSANDO[m[K
 A [01;32m[KLIBERA[m[K
-C [01;33m[KUSANDO[m[K
-C [01;32m[KLIBERA[m[K
-[01;35m[KDETECTOU[m[K [01;35m[KINANICAO[m[K D
-[01;35m[KDETECTOU[m[K [01;35m[KINANICAO[m[K c
+[01;36m[KDEADLOCK[m[K [01;36m[KRECOVERY[m[K
 a [01;33m[KUSANDO[m[K
-C [01;30m[KESPERA[m[K
 a [01;32m[KLIBERA[m[K
-c [01;33m[KUSANDO[m[K
-a [01;30m[KESPERA[m[K
-c [01;32m[KLIBERA[m[K
-D [01;33m[KUSANDO[m[K
-c [01;30m[KESPERA[m[K
-D [01;32m[KLIBERA[m[K
-[01;35m[KDETECTOU[m[K [01;35m[KINANICAO[m[K d
-[01;35m[KDETECTOU[m[K [01;35m[KINANICAO[m[K b
-a [01;33m[KUSANDO[m[K
-D [01;30m[KESPERA[m[K
-a [01;32m[KLIBERA[m[K
-d [01;33m[KUSANDO[m[K
-d [01;32m[KLIBERA[m[K
-C [01;33m[KUSANDO[m[K
-C [01;32m[KLIBERA[m[K
-c [01;33m[KUSANDO[m[K
-c [01;32m[KLIBERA[m[K
 B [01;33m[KUSANDO[m[K
 B [01;32m[KLIBERA[m[K
 b [01;33m[KUSANDO[m[K
-d [01;30m[KESPERA[m[K
 b [01;32m[KLIBERA[m[K
+c [01;33m[KUSANDO[m[K
+c [01;32m[KLIBERA[m[K
+C [01;33m[KUSANDO[m[K
+C [01;32m[KLIBERA[m[K
+D [01;33m[KUSANDO[m[K
+a [01;30m[KESPERA[m[K
+B [01;30m[KESPERA[m[K
+D [01;32m[KLIBERA[m[K
+a [01;33m[KUSANDO[m[K
+c [01;30m[KESPERA[m[K
+a [01;32m[KLIBERA[m[K
+B [01;33m[KUSANDO[m[K
+C [01;30m[KESPERA[m[K
+B [01;32m[KLIBERA[m[K
+c [01;33m[KUSANDO[m[K
+c [01;32m[KLIBERA[m[K
+C [01;33m[KUSANDO[m[K
+C [01;32m[KLIBERA[m[K
+d [01;33m[KUSANDO[m[K
+D [01;30m[KESPERA[m[K
+d [01;32m[KLIBERA[m[K
 D [01;33m[KUSANDO[m[K
 D [01;32m[KLIBERA[m[K
+d [01;30m[KESPERA[m[K
 d [01;33m[KUSANDO[m[K
-B [01;30m[KESPERA[m[K
 d [01;32m[KLIBERA[m[K
-B [01;33m[KUSANDO[m[K
-B [01;32m[KLIBERA[m[K

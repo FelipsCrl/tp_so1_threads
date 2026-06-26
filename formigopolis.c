@@ -54,16 +54,16 @@ void esperar(Pessoa *pessoa, monitor_caixa *mc)
 
     estaNaFilaCaixa(pessoa, mc);
 
-    while (mc->caixaOcupado || (pessoa != proximaPessoaPrioridade(mc) && pessoa != mc->escolhidaGerente))
+    while (mc->caixaOcupado || (mc->escolhidaGerente != NULL && pessoa != mc->escolhidaGerente) || (mc->escolhidaGerente == NULL && pessoa != proximaPessoaPrioridade(mc)))
     {
         pthread_cond_wait(&mc->condincaoPorPessoa[pessoa->id], &mc->mutex);
     }
 
     mc->caixaOcupado = 1;
 
+    removeDaFila(pessoa, mc);
     envelhecerPessoas(pessoa, mc);
 
-    removeDaFila(pessoa, mc);
 
     if (mc->escolhidaGerente == pessoa)
         mc->escolhidaGerente = NULL; // Reseta a pessoa escolhida pelo gerente
@@ -111,10 +111,21 @@ void liberar(Pessoa *pessoa, monitor_caixa *mc)
 
     if (mc->quantidadeDePessoasNaFila != 0)
     {
-        Pessoa *proximaPessoa = proximaPessoaPrioridade(mc);
+        if (mc->escolhidaGerente != NULL)
+        {
+            pthread_cond_signal(
+                &mc->condincaoPorPessoa[mc->escolhidaGerente->id]);
+        }
+        else
+        {
+            Pessoa *proximaPessoa = proximaPessoaPrioridade(mc);
 
-        if (proximaPessoa != NULL)
-            pthread_cond_signal(&mc->condincaoPorPessoa[proximaPessoa->id]);
+            if (proximaPessoa != NULL)
+            {
+                pthread_cond_signal(
+                    &mc->condincaoPorPessoa[proximaPessoa->id]);
+            }
+        }
     }
 
     pthread_mutex_unlock(&mc->mutex);
@@ -175,10 +186,21 @@ void verificar(monitor_caixa *mc)
 
     if (temGravida && temIdoso && temDeficiente)
     {
-        int numeroEscolhido = rand() % mc->quantidadeDePessoasNaFila;
+        Pessoa *candidatos[QTD_PRIORIDADES * 2];
+        int numeroDePessoas = 0;
 
-        Pessoa *escolhida = mc->filaCaixa[numeroEscolhido];
+        for (int i = 0; i < mc->quantidadeDePessoasNaFila; i++)
+        {
+            if (mc->filaCaixa[i]->prioridadeAtual != COMUM)
+            {
+                candidatos[numeroDePessoas++] = mc->filaCaixa[i];
+            }
+        }
+        Pessoa *escolhida = candidatos[rand() % numeroDePessoas];
+
         mc->escolhidaGerente = escolhida;
+
+        detectouDeadlock(escolhida);
 
         pthread_cond_signal(&mc->condincaoPorPessoa[escolhida->id]);
     }
@@ -211,7 +233,10 @@ Pessoa *proximaPessoaPrioridade(monitor_caixa *mc)
     }
     if (temGravida && temIdoso && temDeficiente)
     {
-        return NULL;
+        if (mc->escolhidaGerente != NULL)
+        return mc->escolhidaGerente;
+
+    return NULL;
     }
 
     Pessoa *escolhida = mc->filaCaixa[0];
