@@ -247,10 +247,8 @@ void imprimeFila(MonitorCaixa *mc)
 // Função que analisa qual é a próxima pessoa a ser atendida
 Pessoa *proximaPessoaPrioridade(MonitorCaixa *mc)
 {
-    // Varíaveis para verificar a existência de grávida, idoso e deficiente
     int temGravida = 0, temIdoso = 0, temDeficiente = 0;
 
-    // Verifica se existe pelo menos uma pessoa de cada uma das três prioridades
     for (int i = 0; i < mc->quantidadeDePessoasNaFila; i++)
     {
         if (mc->filaCaixa[i]->prioridadeAtual == GRAVIDA)
@@ -260,46 +258,34 @@ Pessoa *proximaPessoaPrioridade(MonitorCaixa *mc)
         if (mc->filaCaixa[i]->prioridadeAtual == DEFICIENTE)
             temDeficiente = 1;
     }
-
-    // Se houver as três prioridades ao mesmo tempo, há um deadlock e a única a ser chamada deve ser a escolhida pelo gerente
     if (temGravida && temIdoso && temDeficiente)
     {
         if (mc->escolhidaGerente != NULL)
             return mc->escolhidaGerente;
 
-        // Retorna vazio, pois deve esperar a escolha do gerente
         return NULL;
     }
 
-    // Inicialmente considera a primeira pessoa da fila como a próxima
-    Pessoa *proximaPessoa = mc->filaCaixa[0];
+    Pessoa *escolhida = mc->filaCaixa[0];
 
-    // Percorre toda a fila procurando a pessoa de maior prioridade
     for (int i = 1; i < mc->quantidadeDePessoasNaFila; i++)
     {
         Pessoa *candidato = mc->filaCaixa[i];
 
-        // Se existir uma grávida e um deficiente, deve chamar o deficiente
-        if (proximaPessoa->prioridadeAtual == GRAVIDA &&
-            candidato->prioridadeAtual == DEFICIENTE)
+        if (escolhida->prioridadeAtual == GRAVIDA && candidato->prioridadeAtual == DEFICIENTE)
         {
-            proximaPessoa = candidato;
+            escolhida = candidato;
         }
 
-        // Caso contrário, escolhe normalmente a de maior prioridade
-        else if (candidato->prioridadeAtual < proximaPessoa->prioridadeAtual)
+        else if (candidato->prioridadeAtual < escolhida->prioridadeAtual)
         {
-            // Evita desfazer a regra acima
-            if (!(candidato->prioridadeAtual == GRAVIDA &&
-                  proximaPessoa->prioridadeAtual == DEFICIENTE))
+            if (!(candidato->prioridadeAtual == GRAVIDA && escolhida->prioridadeAtual == DEFICIENTE))
             {
-                proximaPessoa = candidato;
+                escolhida = candidato;
             }
         }
     }
-
-    // Retorna a próxima pessoa a ser chamada
-    return proximaPessoa;
+    return escolhida;
 }
 
 // Função usada pelas threads das pessoas
